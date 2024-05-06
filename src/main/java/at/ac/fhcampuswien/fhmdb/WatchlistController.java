@@ -32,7 +32,6 @@ public class WatchlistController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Hier könntest du weitere Initialisierungen vornehmen, wenn nötig
         loadWatchlistFromAPI();
     }
 
@@ -40,10 +39,9 @@ public class WatchlistController implements Initializable {
         // Methode der API aufrufen, um die Filme der Watchlist abzurufen
         List<Movie> watchlistMovies = MovieAPI.getWatchlistMovies();
 
-        // Überprüfen, ob die zurückgegebene Liste null ist
+        // zurückgegebene List null oder nicht
         if (watchlistMovies != null) {
-            // Filme zur ObservableList hinzufügen, um sie in der ListView anzuzeigen
-            watchlist.addAll(watchlistMovies);
+            watchlist.addAll(watchlistMovies);  // Filme zur ObservableList hinzufügen, um sie in der ListView anzuzeigen
         }
 
         // Items der ListView auf die Filme der Watchlist setzen
