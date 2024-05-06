@@ -14,6 +14,14 @@ public class MovieAPI {
     public static final String DELIMITER = "&";
     private static final String URL = "http://prog2.fh-campuswien.ac.at/movies"; // https if certificates work
     private static final OkHttpClient client = new OkHttpClient();
+    private static List<Movie> watchlistMovies;
+
+    public static List<Movie> getWatchlistMovies() {
+        return watchlistMovies;
+    }
+    public static void addToWatchList(Movie movie) {
+        watchlistMovies.add(movie);
+    }
 
     private String buildUrl(UUID id) {
         StringBuilder url = new StringBuilder(URL);

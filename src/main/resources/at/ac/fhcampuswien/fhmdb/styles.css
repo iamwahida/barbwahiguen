@@ -3,6 +3,11 @@
     -fx-background-color: #f5c518;
 }
 
+.background-yellow:pressed {
+    -fx-background-color: #F5C518;
+}
+
+
 .background-black {
     -fx-background-color: #000000;
 }
