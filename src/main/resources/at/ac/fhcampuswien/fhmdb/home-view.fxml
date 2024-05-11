@@ -45,6 +45,8 @@
          <Label styleClass="text-white" stylesheets="@styles.css" text="Home" />
       </children>
    </HBox>
+
+
    <HBox spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
       <children>
          <JFXButton fx:id="sortBtn" onAction="#sortBtnClicked" styleClass="background-yellow" stylesheets="@styles.css" text="Sort" />
@@ -61,5 +63,7 @@
          <Insets bottom="20.0" left="10.0" top="20.0" />
       </padding>
    </HBox>
+
+
    <JFXListView fx:id="movieListView" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
 </VBox>
