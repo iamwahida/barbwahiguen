@@ -12,4 +12,13 @@ public class WatchlistMovieEntity {
 
     //A default constructor is needed so that the object can be returned from a DB query or so that a table can be created
     public WatchlistMovieEntity(){}
+
+    //Getter fpr Api-ID
+    public String getApiId () {
+        return apiId;
+    }
+
+    public void setApiId (String apiId) {
+        this.apiId = apiId;
+    }
 }

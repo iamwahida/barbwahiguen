@@ -66,4 +66,5 @@
 
 
    <JFXListView fx:id="movieListView" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
+
 </VBox>

@@ -37,7 +37,7 @@ public class DatabaseManager {
            movieDao = DaoManager.createDao(connectionSource, MovieEntity.class);
            createTables();
            watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
-       } catch (SQLException e){
+       } catch (SQLException e) {
             System.out.println(e.getMessage());
        }
     }
@@ -69,8 +69,13 @@ public class DatabaseManager {
 
     }
 
-    Dao getWatchlistDao(){ return watchlistDao; }
+    public Dao<WatchlistMovieEntity, Long> getWatchlistDao() {
+        return watchlistDao;
+    }
 
-    Dao getMovieDao(){ return movieDao; }
-
+    /*
+    Dao getMovieDao(){
+        return movieDao;
+    }
+     */
 }

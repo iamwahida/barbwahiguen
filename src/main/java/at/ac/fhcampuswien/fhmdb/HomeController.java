@@ -1,6 +1,10 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -82,10 +86,34 @@ public class HomeController implements Initializable {
         window.show();
     }
 
+    //add movies to watchlist
+    @FXML
+    public void addMovieToWatchlist() {
+        WatchlistMovieEntity selectedMovie = (WatchlistMovieEntity) movieListView.getSelectionModel().getSelectedItem();  //movie von listview holen
+        WatchlistRepository watchlistRepository = new WatchlistRepository(DatabaseManager.getDatabaseSingleInstance().getWatchlistDao());
+
+
+        if (selectedMovie != null) {
+            String movieID = selectedMovie.getApiId();
+            boolean addedSuccess = watchlistRepository.addToWatchList(movieID);
+
+            if (addedSuccess) {
+                System.out.println("Movie was added successfully to Watchlist.");
+            } else {
+                System.out.println("There was an Error while adding movie to Watchlist.");
+            }
+        } else {
+            System.out.println("Please select a movie if you want to add it to Watchlist.");
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeState();
         initializeLayout();
+
+        MovieCell movieCell = new MovieCell();
+        movieCell.setHomeController(this);
     }
 
     public void initializeState() {

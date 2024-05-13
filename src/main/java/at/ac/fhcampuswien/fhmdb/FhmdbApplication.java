@@ -21,7 +21,6 @@ public class FhmdbApplication extends Application {
         stage.show();
 
         DatabaseManager.getDatabaseSingleInstance();
-
     }
 
     public static void main(String[] args) {

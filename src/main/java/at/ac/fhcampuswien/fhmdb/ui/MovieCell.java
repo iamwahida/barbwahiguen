@@ -1,12 +1,15 @@
 package at.ac.fhcampuswien.fhmdb.ui;
 
+import at.ac.fhcampuswien.fhmdb.HomeController;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -17,18 +20,23 @@ public class MovieCell extends ListCell<Movie> {
     private final Label detail = new Label();
     private final Label genre = new Label();
     private final JFXButton detailBtn = new JFXButton("Show Details");
-    private final VBox layout = new VBox(title, detail, genre, detailBtn);
+    private final JFXButton addBtn = new JFXButton("Add");
+    private final HBox buttonBox = new HBox(10,detailBtn, addBtn);
+    private final VBox layout = new VBox(title, detail, genre, buttonBox);
     private boolean collapsedDetails = true;
 
     public MovieCell() {
         super();
         // color scheme
+        addBtn.setStyle("-fx-background-color: #f5c518;");
         detailBtn.setStyle("-fx-background-color: #f5c518;");
         title.getStyleClass().add("text-yellow");
         detail.getStyleClass().add("text-white");
         genre.getStyleClass().add("text-white");
         genre.setStyle("-fx-font-style: italic");
         layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
+        //buttonBox.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
+
 
         // layout
         title.fontProperty().set(title.getFont().font(20));
@@ -76,6 +84,15 @@ public class MovieCell extends ListCell<Movie> {
         details.getChildren().add(mainCast);
         return details;
     }
+
+    private HomeController homeController;
+    public void setHomeController (HomeController controller) {
+        this.homeController = controller;
+    }
+    public void setAddButtonAction() {
+        addBtn.setOnAction(event -> homeController.addMovieToWatchlist());
+    }
+
     @Override
     protected void updateItem(Movie movie, boolean empty) {
         super.updateItem(movie, empty);
@@ -98,6 +115,7 @@ public class MovieCell extends ListCell<Movie> {
                     .collect(Collectors.joining(", "));
             genre.setText(genres);
 
+            setAddButtonAction();
             detail.setMaxWidth(this.getScene().getWidth() - 30);
 
             setGraphic(layout);

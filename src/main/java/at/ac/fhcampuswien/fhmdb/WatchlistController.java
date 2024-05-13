@@ -1,6 +1,9 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.jfoenix.controls.JFXListView;
 import javafx.collections.FXCollections;
@@ -28,25 +31,33 @@ public class WatchlistController implements Initializable {
     @FXML
     private JFXListView<Movie> watchlistListView;
 
-    private ObservableList<Movie> watchlist = FXCollections.observableArrayList();
+    private WatchlistRepository watchlistRepository;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadWatchlistFromAPI();
-    }
+        watchlistRepository = new WatchlistRepository();
 
-    private void loadWatchlistFromAPI() {
-        // Methode der API aufrufen, um die Filme der Watchlist abzurufen
-        List<Movie> watchlistMovies = MovieAPI.getWatchlistMovies();
+       /* MUSS NOCH GEMACHT WERDEN - wahida
+        List<WatchlistRepository> watchlistMovies = watchlistRepository.getWatchlist();
 
-        // zurückgegebene List null oder nicht
-        if (watchlistMovies != null) {
-            watchlist.addAll(watchlistMovies);  // Filme zur ObservableList hinzufügen, um sie in der ListView anzuzeigen
-        }
+        ObservableList<WatchlistRepository> watchlist = FXCollections.observableArrayList(watchlistMovies);
 
-        // Items der ListView auf die Filme der Watchlist setzen
         watchlistListView.setItems(watchlist);
+        watchlistListView.setCellFactory(param -> new ListCell<WatchlistRepository>() {
+            @Override
+            protected void updateItem(MovieEntity item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle());
+                }
+            }
+        });
+
+        */
     }
+
 
     @FXML
     private void switchToWatchlist(ActionEvent event) throws IOException {
