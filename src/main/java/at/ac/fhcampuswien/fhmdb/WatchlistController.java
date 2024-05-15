@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
 import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
@@ -19,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 
 public class WatchlistController implements Initializable {
@@ -32,32 +34,53 @@ public class WatchlistController implements Initializable {
     private JFXListView<Movie> watchlistListView;
 
     private WatchlistRepository watchlistRepository;
+    private MovieRepository movieRepository;
+
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        watchlistRepository = new WatchlistRepository();
-
-       /* MUSS NOCH GEMACHT WERDEN - wahida
-        List<WatchlistRepository> watchlistMovies = watchlistRepository.getWatchlist();
-
-        ObservableList<WatchlistRepository> watchlist = FXCollections.observableArrayList(watchlistMovies);
-
-        watchlistListView.setItems(watchlist);
-        watchlistListView.setCellFactory(param -> new ListCell<WatchlistRepository>() {
-            @Override
-            protected void updateItem(MovieEntity item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getTitle());
-                }
-            }
-        });
-
-        */
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+      //  loadWatchlist();
     }
 
+    public WatchlistController () {
+
+    }
+
+    public WatchlistController(WatchlistRepository watchlistRepository, MovieRepository movieRepository) {
+        this.watchlistRepository = watchlistRepository;
+        this.movieRepository = movieRepository;
+    }
+
+    public void addMovieToWatchlist(String apiId) {
+        try {
+            watchlistRepository.addMovieToWatchlist(apiId);
+            System.out.println("Film erfolgreich zur Watchlist hinzugefügt.");
+        } catch (SQLException e) {
+            // Fehlerbehandlung
+            e.printStackTrace();
+        }
+    }
+
+    public List<MovieEntity> getWatchlistMovies() {
+        //leere List, um die Filme in die Watchlist hinzuzufügen
+        List<MovieEntity> watchlistMovies = new ArrayList<>();
+        try {
+            //alle Objekte aus WatchlistMovieEntity abrufen
+            List<WatchlistMovieEntity> watchlistEntities = watchlistRepository.getAllWatchlistMovies();
+            //für jedes WatchlistMovieEntity die zugehörige MovieEntity abrufen
+            for (WatchlistMovieEntity entity : watchlistEntities) {
+                //Api ID des Films von WatchlistMoveEntity abrufen
+                MovieEntity movie = movieRepository.getMovieByApiId(entity.getApiId());
+                if (movie != null) {
+                    watchlistMovies.add(movie);
+                }
+            }
+        } catch (SQLException e) {
+            // Fehlerbehandlung
+            e.printStackTrace();
+        }
+        return watchlistMovies;
+    }
 
     @FXML
     private void switchToWatchlist(ActionEvent event) throws IOException {

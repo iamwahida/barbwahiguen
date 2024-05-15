@@ -1,10 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
-import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
-import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
-import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -59,9 +55,20 @@ public class HomeController implements Initializable {
 
     public List<Movie> allMovies;
 
+    private WatchlistController watchlistController;
+
     protected ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
 
     protected SortedState sortedState;
+
+    public HomeController() {
+        initializeWatchlistController();
+    }
+    private void initializeWatchlistController() {
+        this.watchlistController = new WatchlistController();
+        MovieCell movieCell = new MovieCell();
+        movieCell.setHomeController(this);
+    }
 
     //Watchlist
     @FXML
@@ -88,22 +95,11 @@ public class HomeController implements Initializable {
 
     //add movies to watchlist
     @FXML
-    public void addMovieToWatchlist() {
-        WatchlistMovieEntity selectedMovie = (WatchlistMovieEntity) movieListView.getSelectionModel().getSelectedItem();  //movie von listview holen
-        WatchlistRepository watchlistRepository = new WatchlistRepository(DatabaseManager.getDatabaseSingleInstance().getWatchlistDao());
-
-
-        if (selectedMovie != null) {
-            String movieID = selectedMovie.getApiId();
-            boolean addedSuccess = watchlistRepository.addToWatchList(movieID);
-
-            if (addedSuccess) {
-                System.out.println("Movie was added successfully to Watchlist.");
-            } else {
-                System.out.println("There was an Error while adding movie to Watchlist.");
-            }
+    public void addToWatchlist( String apiId) {
+        if (watchlistController != null) {
+            watchlistController.addMovieToWatchlist(apiId);
         } else {
-            System.out.println("Please select a movie if you want to add it to Watchlist.");
+            System.out.println("Fehler beim hinzufügen");
         }
     }
 

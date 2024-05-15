@@ -4,7 +4,6 @@ import at.ac.fhcampuswien.fhmdb.HomeController;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.Background;
@@ -89,9 +88,10 @@ public class MovieCell extends ListCell<Movie> {
     public void setHomeController (HomeController controller) {
         this.homeController = controller;
     }
-    public void setAddButtonAction() {
-        addBtn.setOnAction(event -> homeController.addMovieToWatchlist());
+    private void setAddButtonAction(Movie movie) {
+        addBtn.setOnAction(event -> homeController.addToWatchlist(movie.getApiId()));
     }
+
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -115,7 +115,7 @@ public class MovieCell extends ListCell<Movie> {
                     .collect(Collectors.joining(", "));
             genre.setText(genres);
 
-            setAddButtonAction();
+            setAddButtonAction(movie);
             detail.setMaxWidth(this.getScene().getWidth() - 30);
 
             setGraphic(layout);

@@ -1,50 +1,39 @@
 package at.ac.fhcampuswien.fhmdb.database;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.QueryBuilder;
-
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import java.sql.SQLException;
 import java.util.List;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
+import com.j256.ormlite.support.ConnectionSource;
 
 
 public class WatchlistRepository {
 
-    private Dao<WatchlistMovieEntity, Long> dao;
+    private Dao<WatchlistMovieEntity, String> watchlistDao;
 
-    public WatchlistRepository(Dao<WatchlistMovieEntity, Long> dao) {
-        this.dao = dao;
+    public WatchlistRepository(ConnectionSource connectionSource) throws SQLException {
+        watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
     }
 
-    public WatchlistRepository() {}
-
-    public boolean addToWatchList(String apiId) {
-        try {
-            QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = dao.queryBuilder();
-            Where<WatchlistMovieEntity, Long> where = queryBuilder.where();
-            where.eq("api_id", apiId);
-            List<WatchlistMovieEntity> existingMovie = queryBuilder.query();
-
-            if (existingMovie.isEmpty()) {
-                WatchlistMovieEntity movieEntity = new WatchlistMovieEntity();
-                movieEntity.setApiId(apiId);
-                dao.create(movieEntity);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public List<WatchlistMovieEntity> getAllWatchlistMovies() throws SQLException {
+        return watchlistDao.queryForAll();
     }
-    public List<WatchlistMovieEntity> getWatchlist() {
-        try {
-            return dao.queryForAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    public void addMovieToWatchlist(String apiId) throws SQLException {
+        WatchlistMovieEntity watchlistMovie = new WatchlistMovieEntity();
+        watchlistMovie.setApiId(apiId);
+        watchlistDao.createIfNotExists(watchlistMovie);
     }
+
+    public void deleteMovieFromWatchlist(String apiId) throws SQLException {
+        DeleteBuilder<WatchlistMovieEntity, String> deleteBuilder = watchlistDao.deleteBuilder();
+        deleteBuilder.where().eq("apiId", apiId);
+        deleteBuilder.delete();
+    }
+    public void clearWatchlist() throws SQLException {
+        watchlistDao.deleteBuilder().delete();
+    }
+
+
 }
