@@ -1,6 +1,7 @@
 package at.ac.fhcampuswien.fhmdb.ui;
 
 import at.ac.fhcampuswien.fhmdb.controllers.HomeController;
+import at.ac.fhcampuswien.fhmdb.controllers.WatchlistController;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -19,20 +20,20 @@ public class MovieCell extends ListCell<Movie> {
     private final Label detail = new Label();
     private final Label genre = new Label();
     private final Button detailBtn = new Button("Show Details");
-    private final Button addBtn = new Button("Add");
-    private final HBox buttonBox = new HBox(10, detailBtn, addBtn);
+    private final Button actionBtn = new Button();
+    private final HBox buttonBox = new HBox(10, detailBtn, actionBtn);
     private final VBox layout = new VBox(title, detail, genre, buttonBox);
-    private HomeController homeController;
+    private Object controller;
     private boolean collapsedDetails = true;  // Track whether details are shown
 
-    public MovieCell(HomeController controller) {
+    public MovieCell(Object controller) {
         super();
-        this.homeController = controller;
+        this.controller = controller;
 
         configureLayout();
         configureButtons();
 
-        setAddButtonAction();
+        setActionButtonAction();
     }
 
     private void configureLayout() {
@@ -51,7 +52,7 @@ public class MovieCell extends ListCell<Movie> {
 
     private void configureButtons() {
         detailBtn.setStyle("-fx-background-color: #f5c518;");
-        addBtn.setStyle("-fx-background-color: #f5c518;");
+        actionBtn.setStyle("-fx-background-color: #f5c518;");
         detailBtn.setOnMouseClicked(mouseEvent -> toggleDetails());
     }
 
@@ -90,11 +91,15 @@ public class MovieCell extends ListCell<Movie> {
         return details;
     }
 
-    public void setAddButtonAction() {
-        addBtn.setOnAction(event -> {
+    public void setActionButtonAction() {
+        actionBtn.setOnAction(event -> {
             Movie movie = getItem();
-            if (homeController != null && movie != null) {
-                homeController.addMovieToWatchlist(movie);
+            if (controller != null && movie != null) {
+                if (controller instanceof HomeController) {
+                    ((HomeController) controller).addMovieToWatchlist(movie);
+                } else if (controller instanceof WatchlistController) {
+                    ((WatchlistController) controller).removeMovieFromWatchlist(movie);
+                }
             }
         });
     }
@@ -109,11 +114,12 @@ public class MovieCell extends ListCell<Movie> {
             title.setText(movie.getTitle());
             detail.setText(movie.getDescription() != null ? movie.getDescription() : "No description available");
             genre.setText(movie.getGenres().stream().map(Enum::toString).collect(Collectors.joining(", ")));
+            if (controller instanceof HomeController) {
+                actionBtn.setText("Add");
+            } else if (controller instanceof WatchlistController) {
+                actionBtn.setText("Remove");
+            }
             setGraphic(layout);
         }
-    }
-
-    public void setHomeController(HomeController homeController) {
-        this.homeController = homeController;
     }
 }

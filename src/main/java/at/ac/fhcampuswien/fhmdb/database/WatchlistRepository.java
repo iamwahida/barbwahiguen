@@ -43,4 +43,24 @@ public class WatchlistRepository {
             return null;
         }
     }
+
+    public void removeFromWatchlist(WatchlistMovieEntity entity) {
+        try {
+            dao.delete(entity);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public WatchlistMovieEntity findByApiId(String apiId) {
+        try {
+            QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().eq("api_id", apiId);
+            List<WatchlistMovieEntity> movieEntities = queryBuilder.query();
+            return movieEntities.isEmpty() ? null : movieEntities.get(0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -51,7 +51,7 @@ public class WatchlistController implements Initializable {
 
         watchlistMovies.setAll(moviesInWatchlist);
         watchlistListView.setItems(watchlistMovies);
-        watchlistListView.setCellFactory(movieListView -> new MovieCell(null)); // Customize as needed
+        watchlistListView.setCellFactory(movieListView -> new MovieCell(this)); // Pass WatchlistController
     }
 
     @FXML
@@ -74,5 +74,13 @@ public class WatchlistController implements Initializable {
         Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
         window.setScene(homeScene);
         window.show();
+    }
+
+    public void removeMovieFromWatchlist(Movie movie) {
+        WatchlistMovieEntity entity = watchlistRepository.findByApiId(movie.getApiId());
+        if (entity != null) {
+            watchlistRepository.removeFromWatchlist(entity);
+            refreshWatchlist();
+        }
     }
 }

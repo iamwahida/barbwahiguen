@@ -67,6 +67,8 @@ public class HomeController implements Initializable {
 
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(watchlistScene);
+        window.setHeight(620);
+        window.setWidth(890);
         window.show();
     }
 
@@ -78,6 +80,8 @@ public class HomeController implements Initializable {
 
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(homeScene);
+        window.setHeight(620);
+        window.setWidth(890);
         window.show();
     }
 
