@@ -104,9 +104,7 @@ public class Movie {
     public double getRating() {
         return rating;
     }
-    public String getApiId() {
-        return this.id;
-    }
+
 
 
     public static List<Movie> initializeMovies(){
