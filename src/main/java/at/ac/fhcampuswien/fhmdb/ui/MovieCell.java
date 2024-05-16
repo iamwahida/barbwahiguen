@@ -1,10 +1,9 @@
 package at.ac.fhcampuswien.fhmdb.ui;
 
-import at.ac.fhcampuswien.fhmdb.HomeController;
+import at.ac.fhcampuswien.fhmdb.controllers.HomeController;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
-import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.Background;
@@ -19,52 +18,63 @@ public class MovieCell extends ListCell<Movie> {
     private final Label title = new Label();
     private final Label detail = new Label();
     private final Label genre = new Label();
-    private final JFXButton detailBtn = new JFXButton("Show Details");
-    private final JFXButton addBtn = new JFXButton("Add");
-    private final HBox buttonBox = new HBox(10,detailBtn, addBtn);
+    private final Button detailBtn = new Button("Show Details");
+    private final Button addBtn = new Button("Add");
+    private final HBox buttonBox = new HBox(10, detailBtn, addBtn);
     private final VBox layout = new VBox(title, detail, genre, buttonBox);
-    private boolean collapsedDetails = true;
+    private HomeController homeController;
+    private boolean collapsedDetails = true;  // Track whether details are shown
 
-    public MovieCell() {
+    public MovieCell(HomeController controller) {
         super();
-        // color scheme
-        addBtn.setStyle("-fx-background-color: #f5c518;");
-        detailBtn.setStyle("-fx-background-color: #f5c518;");
+        this.homeController = controller;
+
+        configureLayout();
+        configureButtons();
+
+        setAddButtonAction();
+    }
+
+    private void configureLayout() {
         title.getStyleClass().add("text-yellow");
         detail.getStyleClass().add("text-white");
         genre.getStyleClass().add("text-white");
         genre.setStyle("-fx-font-style: italic");
         layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
-        //buttonBox.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
 
-
-        // layout
         title.fontProperty().set(title.getFont().font(20));
         detail.setWrapText(true);
         layout.setPadding(new Insets(10));
         layout.spacingProperty().set(10);
         layout.alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT);
+    }
 
-        detailBtn.setOnMouseClicked(mouseEvent -> {
-            if (collapsedDetails) {
-                layout.getChildren().add(getDetails());
-                collapsedDetails = false;
-                detailBtn.setText("Hide Details");
-            } else {
-                layout.getChildren().remove(4);
-                collapsedDetails = true;
-                detailBtn.setText("Show Details");
-            }
-            setGraphic(layout);
-        });
+    private void configureButtons() {
+        detailBtn.setStyle("-fx-background-color: #f5c518;");
+        addBtn.setStyle("-fx-background-color: #f5c518;");
+        detailBtn.setOnMouseClicked(mouseEvent -> toggleDetails());
+    }
+
+    private void toggleDetails() {
+        if (collapsedDetails) {
+            layout.getChildren().add(getDetails());
+            collapsedDetails = false;
+            detailBtn.setText("Hide Details");
+        } else {
+            layout.getChildren().remove(4);
+            collapsedDetails = true;
+            detailBtn.setText("Show Details");
+        }
+        setGraphic(layout);
     }
 
     private VBox getDetails() {
         VBox details = new VBox();
+        details.setSpacing(5);
+
         Label releaseYear = new Label("Release Year: " + getItem().getReleaseYear());
         Label length = new Label("Length: " + getItem().getLengthInMinutes() + " minutes");
         Label rating = new Label("Rating: " + getItem().getRating() + "/10");
-
         Label directors = new Label("Directors: " + String.join(", ", getItem().getDirectors()));
         Label writers = new Label("Writers: " + String.join(", ", getItem().getWriters()));
         Label mainCast = new Label("Main Cast: " + String.join(", ", getItem().getMainCast()));
@@ -76,50 +86,34 @@ public class MovieCell extends ListCell<Movie> {
         writers.getStyleClass().add("text-white");
         mainCast.getStyleClass().add("text-white");
 
-        details.getChildren().add(releaseYear);
-        details.getChildren().add(rating);
-        details.getChildren().add(length);
-        details.getChildren().add(directors);
-        details.getChildren().add(writers);
-        details.getChildren().add(mainCast);
+        details.getChildren().addAll(releaseYear, length, rating, directors, writers, mainCast);
         return details;
     }
 
-    private HomeController homeController;
-    public void setHomeController (HomeController controller) {
-        this.homeController = controller;
-    }
     public void setAddButtonAction() {
-        addBtn.setOnAction(event -> homeController.addMovieToWatchlist());
+        addBtn.setOnAction(event -> {
+            Movie movie = getItem();
+            if (homeController != null && movie != null) {
+                homeController.addMovieToWatchlist(movie);
+            }
+        });
     }
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
         super.updateItem(movie, empty);
-
         if (empty || movie == null) {
             setGraphic(null);
             setText(null);
         } else {
-            this.getStyleClass().add("movie-cell");
             title.setText(movie.getTitle());
-            detail.setText(
-                    movie.getDescription() != null
-                            ? movie.getDescription()
-                            : "No description available"
-            );
-
-            String genres = movie.getGenres()
-                    .stream()
-                    .map(Enum::toString)
-                    .collect(Collectors.joining(", "));
-            genre.setText(genres);
-
-            setAddButtonAction();
-            detail.setMaxWidth(this.getScene().getWidth() - 30);
-
+            detail.setText(movie.getDescription() != null ? movie.getDescription() : "No description available");
+            genre.setText(movie.getGenres().stream().map(Enum::toString).collect(Collectors.joining(", ")));
             setGraphic(layout);
         }
     }
-}
 
+    public void setHomeController(HomeController homeController) {
+        this.homeController = homeController;
+    }
+}

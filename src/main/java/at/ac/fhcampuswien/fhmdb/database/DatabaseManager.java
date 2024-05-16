@@ -1,81 +1,79 @@
 package at.ac.fhcampuswien.fhmdb.database;
 
-//In this class we define the basics to allow the program to connect to the database
-//Instead of a server database, we choose an embedded database that runs locally on the machine, saves data
-//into files, and upon start brings the data into memory
-
-/*Possible locations of the database (when embedded):
-jdbc:h2:[file:][<path>]<databaseName>
-jdbc:h2:~/test
-jdbc:h2:file:/data/sample
-jdbc:h2:file:C:/data/sample (Windows)
- */
-
-import com.j256.ormlite.dao.*;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 
-
 public class DatabaseManager {
 
-    public static final String DB_URL = "jdbc:h2:file: ./db/movierepositorydb";
-    public static final String username = "user";
-    public static final String password = "password";
-    public static ConnectionSource connectionSource;
+    private static final String DB_URL = "jdbc:h2:file:./db/movierepositorydb";
+    private static final String USERNAME = "user";
+    private static final String PASSWORD = "password";
+    private static ConnectionSource connectionSource;
 
-    Dao <MovieEntity, Long> movieDao;
-    Dao <WatchlistMovieEntity, Long> watchlistDao;
+    private Dao<MovieEntity, Long> movieDao;
+    private Dao<WatchlistMovieEntity, Long> watchlistDao;
 
-    //Ensure only one database instance is present at any time
-    private static DatabaseManager singleInstance;
-    //Connect to the database and create the necessary tables to store single movie data & watchlist
-    private DatabaseManager(){
-       try {
-           createConnectionSource();
-           movieDao = DaoManager.createDao(connectionSource, MovieEntity.class);
-           createTables();
-           watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
-       } catch (SQLException e) {
-            System.out.println(e.getMessage());
-       }
-    }
-    public static DatabaseManager getDatabaseSingleInstance(){
-        if(singleInstance == null){
-            return singleInstance = new DatabaseManager();
-        }
-        return singleInstance;
-    }
+    // Singleton instance
+    private static DatabaseManager instance;
 
-    void createConnectionSource() {
+    // Private constructor for singleton
+    private DatabaseManager() {
         try {
-            connectionSource = new JdbcConnectionSource(DB_URL, username, password);
-        } catch (SQLException e){
-            System.out.println(e.getMessage());
+            createConnectionSource();
+            movieDao = DaoManager.createDao(connectionSource, MovieEntity.class);
+            watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
+            createTables();
+        } catch (SQLException e) {
+            System.err.println("Error initializing the database manager: " + e.getMessage());
+            closeConnection();
+            throw new RuntimeException("Failed to initialize database connections", e);
         }
     }
 
-    ConnectionSource getConnectionSource(){ return connectionSource;}
+    // Public method to get the singleton instance
+    public static synchronized DatabaseManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseManager();
+        }
+        return instance;
+    }
 
-    //<T> use generics to pass any class reference
-    //TODO: Write better Exception Handling
-    void createTables(){
+    private void createConnectionSource() throws SQLException {
+        connectionSource = new JdbcConnectionSource(DB_URL, USERNAME, PASSWORD);
+    }
+
+    private void createTables() {
         try {
             TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
-        } catch (SQLException e){
-            e.printStackTrace();
+            TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
+        } catch (SQLException e) {
+            System.err.println("Error creating tables: " + e.getMessage());
+            throw new RuntimeException("Failed to create tables", e);
         }
+    }
 
+    public Dao<MovieEntity, Long> getMovieDao() {
+        return movieDao;
     }
 
     public Dao<WatchlistMovieEntity, Long> getWatchlistDao() {
         return watchlistDao;
     }
 
-    /*
-    Dao getMovieDao(){
-        return movieDao;
+    // Ensure connections are closed properly
+    public void closeConnection() {
+        if (connectionSource != null) {
+            try {
+                connectionSource.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing the database connection: " + e.getMessage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-     */
 }

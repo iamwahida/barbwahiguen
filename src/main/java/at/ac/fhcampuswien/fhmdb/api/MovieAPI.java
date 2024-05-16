@@ -2,33 +2,27 @@ package at.ac.fhcampuswien.fhmdb.api;
 
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
-import okhttp3.*;
 import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public class MovieAPI {
     public static final String DELIMITER = "&";
-    private static final String URL = "http://prog2.fh-campuswien.ac.at/movies"; // https if certificates work
+    private static final String URL = "http://prog2.fh-campuswien.ac.at/movies";
     private static final OkHttpClient client = new OkHttpClient();
-    private static List<Movie> watchlistMovies;
+    private static List<Movie> watchlistMovies = new ArrayList<>();
 
     public static List<Movie> getWatchlistMovies() {
         return watchlistMovies;
     }
+
     public static void addToWatchList(Movie movie) {
         watchlistMovies.add(movie);
-    }
-
-    private String buildUrl(UUID id) {
-        StringBuilder url = new StringBuilder(URL);
-        if (id != null) {
-            url.append("/").append(id);
-        }
-        return url.toString();
     }
 
     private static String buildUrl(String query, Genre genre, String releaseYear, String ratingFrom) {
@@ -61,19 +55,18 @@ public class MovieAPI {
         return getAllMovies(null, null, null, null);
     }
 
-    public static List<Movie> getAllMovies(String query, Genre genre, String releaseYear, String ratingFrom){
+    public static List<Movie> getAllMovies(String query, Genre genre, String releaseYear, String ratingFrom) {
         String url = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()
                 .url(url)
                 .removeHeader("User-Agent")
-                .addHeader("User-Agent", "http.agent")  // needed for the server to accept the request
+                .addHeader("User-Agent", "http.agent")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             String responseBody = response.body().string();
             Gson gson = new Gson();
             Movie[] movies = gson.fromJson(responseBody, Movie[].class);
-
             return Arrays.asList(movies);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -81,19 +74,21 @@ public class MovieAPI {
         return new ArrayList<>();
     }
 
-    public Movie requestMovieById(UUID id){
-        String url = buildUrl(id);
+    public static Movie getMovieById(String apiId) {
+        String url = URL + "/" + apiId;
         Request request = new Request.Builder()
                 .url(url)
+                .removeHeader("User-Agent")
+                .addHeader("User-Agent", "http.agent")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
             Gson gson = new Gson();
-            return gson.fromJson(response.body().string(), Movie.class);
+            return gson.fromJson(responseBody, Movie.class);
         } catch (Exception e) {
-            System.err.println(this.getClass() + ": http status not ok");
+            System.err.println(e.getMessage());
         }
-
         return null;
     }
 }

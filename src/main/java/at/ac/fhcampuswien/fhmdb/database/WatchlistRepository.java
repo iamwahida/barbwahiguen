@@ -5,12 +5,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
-
 
 public class WatchlistRepository {
-
     private Dao<WatchlistMovieEntity, Long> dao;
 
     public WatchlistRepository(Dao<WatchlistMovieEntity, Long> dao) {
@@ -22,8 +18,7 @@ public class WatchlistRepository {
     public boolean addToWatchList(String apiId) {
         try {
             QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = dao.queryBuilder();
-            Where<WatchlistMovieEntity, Long> where = queryBuilder.where();
-            where.eq("api_id", apiId);
+            queryBuilder.where().eq("api_id", apiId);
             List<WatchlistMovieEntity> existingMovie = queryBuilder.query();
 
             if (existingMovie.isEmpty()) {
@@ -39,6 +34,7 @@ public class WatchlistRepository {
             return false;
         }
     }
+
     public List<WatchlistMovieEntity> getWatchlist() {
         try {
             return dao.queryForAll();

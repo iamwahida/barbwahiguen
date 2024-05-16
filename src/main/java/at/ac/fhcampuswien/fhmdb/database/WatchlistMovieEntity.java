@@ -10,15 +10,13 @@ public class WatchlistMovieEntity {
     @DatabaseField(columnName = "api_id")
     private String apiId;
 
-    //A default constructor is needed so that the object can be returned from a DB query or so that a table can be created
-    public WatchlistMovieEntity(){}
+    public WatchlistMovieEntity() {}
 
-    //Getter fpr Api-ID
-    public String getApiId () {
+    public String getApiId() {
         return apiId;
     }
 
-    public void setApiId (String apiId) {
+    public void setApiId(String apiId) {
         this.apiId = apiId;
     }
 }

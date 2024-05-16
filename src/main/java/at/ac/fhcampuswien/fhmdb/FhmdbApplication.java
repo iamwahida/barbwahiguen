@@ -20,7 +20,7 @@ public class FhmdbApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        DatabaseManager.getDatabaseSingleInstance();
+        DatabaseManager.getInstance();
     }
 
     public static void main(String[] args) {
