@@ -1,5 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.api;
+package at.ac.fhcampuswien.fhmdb.database;
 
+import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.google.gson.Gson;
@@ -7,6 +8,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +76,7 @@ public class MovieAPI {
         return new ArrayList<>();
     }
 
-    public static Movie getMovieById(String apiId) {
+    public static Movie getMovieById(String apiId) throws MovieApiException {
         String url = URL + "/" + apiId;
         Request request = new Request.Builder()
                 .url(url)
@@ -83,12 +85,15 @@ public class MovieAPI {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new MovieApiException("Error fetching movie by ID from API: " + response.message());
+            }
+
             String responseBody = response.body().string();
             Gson gson = new Gson();
             return gson.fromJson(responseBody, Movie.class);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+        } catch (IOException e) {
+            throw new MovieApiException("Error fetching movie by ID from API", e);
         }
-        return null;
     }
 }

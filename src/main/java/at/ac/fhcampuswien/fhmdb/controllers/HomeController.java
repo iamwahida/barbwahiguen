@@ -1,8 +1,9 @@
 package at.ac.fhcampuswien.fhmdb.controllers;
 
-import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.database.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
 import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
+import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import javafx.collections.FXCollections;
@@ -86,7 +87,7 @@ public class HomeController implements Initializable {
     }
 
     @FXML
-    public void addMovieToWatchlist(Movie movie) {
+    public void addMovieToWatchlist(Movie movie) throws DatabaseException {
         if (movie != null) {
             boolean success = watchlistRepository.addToWatchList(movie.getApiId());
             if (success) {

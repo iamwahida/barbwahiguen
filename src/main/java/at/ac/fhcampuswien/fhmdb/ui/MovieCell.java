@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.fhmdb.ui;
 
 import at.ac.fhcampuswien.fhmdb.controllers.HomeController;
 import at.ac.fhcampuswien.fhmdb.controllers.WatchlistController;
+import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -96,7 +97,11 @@ public class MovieCell extends ListCell<Movie> {
             Movie movie = getItem();
             if (controller != null && movie != null) {
                 if (controller instanceof HomeController) {
-                    ((HomeController) controller).addMovieToWatchlist(movie);
+                    try {
+                        ((HomeController) controller).addMovieToWatchlist(movie);
+                    } catch (DatabaseException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (controller instanceof WatchlistController) {
                     ((WatchlistController) controller).removeMovieFromWatchlist(movie);
                 }

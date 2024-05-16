@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.database;
 
+import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 
@@ -15,7 +16,7 @@ public class WatchlistRepository {
 
     public WatchlistRepository() {}
 
-    public boolean addToWatchList(String apiId) {
+    public boolean addToWatchList(String apiId) throws DatabaseException {
         try {
             QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().eq("api_id", apiId);
@@ -30,37 +31,34 @@ public class WatchlistRepository {
                 return false;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new DatabaseException("Error adding movie to watchlist", e);
         }
     }
 
-    public List<WatchlistMovieEntity> getWatchlist() {
+    public List<WatchlistMovieEntity> getWatchlist() throws DatabaseException {
         try {
             return dao.queryForAll();
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new DatabaseException("Error retrieving watchlist", e);
         }
     }
 
-    public void removeFromWatchlist(WatchlistMovieEntity entity) {
+    public void removeFromWatchlist(WatchlistMovieEntity entity) throws DatabaseException {
         try {
             dao.delete(entity);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Error removing movie from watchlist", e);
         }
     }
 
-    public WatchlistMovieEntity findByApiId(String apiId) {
+    public WatchlistMovieEntity findByApiId(String apiId) throws DatabaseException {
         try {
             QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().eq("api_id", apiId);
             List<WatchlistMovieEntity> movieEntities = queryBuilder.query();
             return movieEntities.isEmpty() ? null : movieEntities.get(0);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new DatabaseException("Error finding movie by API ID", e);
         }
     }
 }
