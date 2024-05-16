@@ -62,6 +62,9 @@ public class Movie {
         return this.title.equals(other.title) && this.description.equals(other.description) && this.genres.equals(other.genres);
     }
 
+    public String getApiId() {
+        return id;
+    }
     public String getTitle() {
         return title;
     }

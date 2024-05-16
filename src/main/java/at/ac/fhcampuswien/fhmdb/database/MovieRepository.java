@@ -1,20 +1,26 @@
 package at.ac.fhcampuswien.fhmdb.database;
 
-import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
-
 import java.sql.SQLException;
 import java.util.List;
 
 public class MovieRepository {
-
     private Dao<MovieEntity, Long> dao;
 
     public MovieRepository(Dao<MovieEntity, Long> dao) {
         this.dao = dao;
     }
 
+    public MovieEntity getMovieByApiId(String apiId) throws SQLException {
+        // Annahme: apiId ist eindeutig für jeden Film in der Datenbank
+        List<MovieEntity> movies = dao.queryForEq("api_id", apiId);
+        if (!movies.isEmpty()) {
+            return movies.get(0); //Es gibt nur einen Film mit einer bestimmten apiId
+        } else {
+            return null; // Film nicht gefunden
+        }
+    }
     // Methode zum Abrufen aller Filme aus der Datenbank
     public List<MovieEntity> getAllMovies() throws SQLException {
         return dao.queryForAll();
