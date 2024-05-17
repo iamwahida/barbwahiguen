@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -50,6 +51,7 @@ public class HomeController implements Initializable {
     private List<Movie> allMovies;
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
     private WatchlistRepository watchlistRepository;
+    private boolean ascendingSort = true;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -100,8 +102,14 @@ public class HomeController implements Initializable {
 
     @FXML
     public void sortBtnClicked(ActionEvent event) {
-        // Implement sorting logic here
-        System.out.println("Sort button clicked");
+        if (ascendingSort) {
+            observableMovies.sort(Comparator.comparing(movie -> movie.getTitle().toLowerCase()));
+            System.out.println("Movies sorted by title in ascending order");
+        } else {
+            observableMovies.sort(Comparator.comparing((Movie movie) -> movie.getTitle().toLowerCase()).reversed());
+            System.out.println("Movies sorted by title in descending order");
+        }
+        ascendingSort = !ascendingSort; // Toggle the sort order
     }
 
     @FXML
