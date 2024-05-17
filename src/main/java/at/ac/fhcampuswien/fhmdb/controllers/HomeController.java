@@ -109,7 +109,7 @@ public class HomeController implements Initializable {
             observableMovies.sort(Comparator.comparing((Movie movie) -> movie.getTitle().toLowerCase()).reversed());
             System.out.println("Movies sorted by title in descending order");
         }
-        ascendingSort = !ascendingSort; // Toggle the sort order
+        ascendingSort = !ascendingSort;
     }
 
     @FXML
