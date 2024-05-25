@@ -1,8 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.controllers;
 
-import at.ac.fhcampuswien.fhmdb.database.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
-import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
+import at.ac.fhcampuswien.fhmdb.database.*;
 import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
@@ -25,6 +23,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,50 +32,57 @@ import java.util.stream.Stream;
 public class HomeController implements Initializable {
     @FXML
     public JFXButton searchBtn;
-
     @FXML
     public TextField searchField;
-
     @FXML
     public JFXListView<Movie> movieListView;
-
     @FXML
     public JFXComboBox<String> genreComboBox;
-
     @FXML
     public JFXComboBox<String> releaseYearComboBox;
-
     @FXML
     public JFXComboBox<String> ratingFromComboBox;
-
     @FXML
     public JFXButton sortBtn;
-
     @FXML
     public JFXButton watchlistButton;
-
     @FXML
     public JFXButton homeButton;
 
-    public List<Movie> allMovies;
-
-    protected ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
-
+    public List <Movie> allMovies;
+    public List <MovieEntity> allMovieEntitiesFromDatabase;
+    public List <MovieEntity> allMovieEntities;
+    protected ObservableList <Movie> observableMovies = FXCollections.observableArrayList();
     protected SortedState sortedState;
 
     private WatchlistRepository watchlistRepository;
+    private MovieRepository movieRepository;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        movieRepository = new MovieRepository(DatabaseManager.getInstance().getMovieDao());
         watchlistRepository = new WatchlistRepository(DatabaseManager.getInstance().getWatchlistDao());
-        initializeState();
+
+        try {
+            initializeState();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         initializeLayout();
     }
 
-    public void initializeState() {
+    public void initializeState() throws SQLException {
+        //Pull movies from the API into a list
         List<Movie> result = MovieAPI.getAllMovies();
-        setMovies(result);
-        setMovieList(result);
+        //Add the list to the MovieEntity table in the database
+        allMovieEntities = MovieEntity.fromMovies(result);
+        //Add all MovieEntities to the Database
+        movieRepository.addAllMovies(allMovieEntities);
+        //Fetch all movies from the database into a Movie List (convert from Movie Entity)
+        allMovieEntitiesFromDatabase = movieRepository.getAllMovies();
+        //Set allMovies List and observable List from the movies in the database/not the API
+        setMovies(MovieEntity.toMovies(allMovieEntitiesFromDatabase));
+        setMovieList(MovieEntity.toMovies(allMovieEntitiesFromDatabase));
         sortedState = SortedState.NONE;
 
         // test stream methods

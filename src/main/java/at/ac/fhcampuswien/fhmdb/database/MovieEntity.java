@@ -35,6 +35,36 @@ public class MovieEntity {
     //A default constructor is needed so that the object can be returned from a DB query or so that a table can be created
     public MovieEntity(){};
 
+    public MovieEntity(String apiId, String title, String description, String genres, int releaseYear, String imgUrl, int lengthInMinutes, double rating){
+        this.apiId = apiId;
+        this.title = title;
+        this.description = description;
+        this.genres = genres;
+        this.releaseYear = releaseYear;
+        this.imgUrl = imgUrl;
+        this.lengthInMinutes = lengthInMinutes;
+        this.rating = rating;
+    }
+
+    //SETTERS & GETTERS
+    public String getApiId() {return apiId;}
+    public void setApiId(String apiId) {this.apiId = apiId;}
+    public String getTitle() {return title;}
+    public void setTitle(String title) {this.title = title;}
+    public String getDescription() {return description;}
+    public void setDescription(String description) {this.description = description;}
+    public String getGenres() {return genres;}
+    public void setGenres(String genres) {this.genres = genres;}
+    public int getReleaseYear() {return releaseYear;}
+    public void setReleaseYear(int releaseYear) {this.releaseYear = releaseYear;}
+    public String getImgUrl() {return imgUrl;}
+    public void setImgUrl(String imgUrl) {this.imgUrl = imgUrl;}
+    public int getLengthInMinutes() {return lengthInMinutes;}
+    public void setLengthInMinutes(int lengthInMinutes) {this.lengthInMinutes = lengthInMinutes;}
+    public double getRating() {return rating;}
+    public void setRating(double rating) {this.rating = rating;}
+
+    //FUNCTIONS
     public static List <MovieEntity> fromMovies(List <Movie> movies){
         List <MovieEntity> listMovieEntities = new ArrayList<>();
         for(Movie movie : movies){
@@ -51,17 +81,17 @@ public class MovieEntity {
         return listMovies;
     }
 
-    public static MovieEntity convertToMovieEntity(Movie movie){
-        MovieEntity movieEntity = new MovieEntity();
-        movieEntity.apiId = movie.getApiId();
-        movieEntity.title = movie.getTitle();
-        movieEntity.description = movie.getDescription();
-        movieEntity.genres = convertGenresToString(movie.getGenres());
-        movieEntity.releaseYear = movie.getReleaseYear();
-        movieEntity.imgUrl = movie.getImgUrl();
-        movieEntity.lengthInMinutes = movie.getLengthInMinutes();
-        movieEntity.rating = movie.getRating();
-        return movieEntity;
+    public static MovieEntity convertToMovieEntity(Movie movie) {
+        return new MovieEntity(
+                movie.getApiId(),
+                movie.getTitle(),
+                movie.getDescription(),
+                convertGenresToString(movie.getGenres()),
+                movie.getReleaseYear(),
+                movie.getImgUrl(),
+                movie.getLengthInMinutes(),
+                movie.getRating()
+        );
     }
 
     public static String convertGenresToString(List <Genre> genres){
@@ -70,14 +100,15 @@ public class MovieEntity {
 
     public static Movie convertToMovie(MovieEntity movieEntity){
         return new Movie(
-                String.valueOf(movieEntity.apiId),
-                movieEntity.title,
-                movieEntity.description,
-                convertStringToGenre(movieEntity.genres),
-                movieEntity.releaseYear,
-                movieEntity.imgUrl,
-                movieEntity.lengthInMinutes,
-                movieEntity.rating);
+                movieEntity.getApiId(),
+                movieEntity.getTitle(),
+                movieEntity.getDescription(),
+                convertStringToGenre(movieEntity.getGenres()),
+                movieEntity.getReleaseYear(),
+                movieEntity.getImgUrl(),
+                movieEntity.getLengthInMinutes(),
+                movieEntity.getRating()
+        );
     }
 
     public static List <Genre> convertStringToGenre(String genres){
