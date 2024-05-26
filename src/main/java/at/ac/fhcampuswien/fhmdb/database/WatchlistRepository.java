@@ -46,6 +46,8 @@ public class WatchlistRepository {
     public void removeFromWatchlist(WatchlistMovieEntity entity) throws DatabaseException {
         try {
             dao.delete(entity);
+            //WatchlistMovieEntity wme = new WatchlistMovieEntity();
+            //dao.delete(wme);
         } catch (SQLException e) {
             throw new DatabaseException("Error removing movie from watchlist", e);
         }

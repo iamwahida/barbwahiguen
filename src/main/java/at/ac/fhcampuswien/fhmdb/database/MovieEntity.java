@@ -112,6 +112,11 @@ public class MovieEntity {
     }
 
     public static List <Genre> convertStringToGenre(String genres){
-        return Arrays.stream(genres.split(",\\s*")).map(Genre::valueOf).collect(Collectors.toList());
+        try {
+            return Arrays.stream(genres.split(",\\s*")).map(Genre::valueOf).collect(Collectors.toList());
+        } catch (IllegalArgumentException | NullPointerException e){
+            System.err.println("Error converting string to genre: " + e.getMessage());
+            return new ArrayList<>(); //Return an emtpy list
+        }
     }
 }

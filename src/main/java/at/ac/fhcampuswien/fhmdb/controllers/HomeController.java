@@ -85,6 +85,7 @@ public class HomeController implements Initializable {
         setMovieList(MovieEntity.toMovies(allMovieEntitiesFromDatabase));
         sortedState = SortedState.NONE;
 
+
         // test stream methods
         System.out.println("getMostPopularActor");
         System.out.println(getMostPopularActor(allMovies));

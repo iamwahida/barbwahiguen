@@ -12,6 +12,9 @@ public class MovieRepository {
     private Dao<MovieEntity, Long> dao;
 
     public MovieRepository(Dao<MovieEntity, Long> dao) {
+        if(dao == null){
+            throw new IllegalArgumentException("DAO cannot be null");
+        }
         this.dao = dao;
     }
 
@@ -21,15 +24,14 @@ public class MovieRepository {
     // Return MovieEntity by apiId
     public MovieEntity getMovieByApiId(String apiId) throws DatabaseException {
         try {
-            // Annahme: apiId ist eindeutig für jeden Film in der Datenbank
-            List<MovieEntity> movies = dao.queryForEq("api_id", apiId);
+            List<MovieEntity> movies = dao.queryForEq("api_id", apiId); //Annahme: apiId ist eindeutig für Jeden Film in der DB
             if (!movies.isEmpty()) {
                 return movies.get(0); // Es gibt nur einen Film mit einer bestimmten apiId
             } else {
                 return null; // Film nicht gefunden
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Error retrieving movie by API ID", e);
+            throw new DatabaseException("Error retrieving movie by API ID: " + apiId, e);
         }
     }
 
@@ -57,7 +59,7 @@ public class MovieRepository {
         try {
             return dao.queryForId(id);
         } catch (SQLException e) {
-            throw new DatabaseException("Error retrieving movie by ID", e);
+            throw new DatabaseException("Error retrieving movie by ID: " + id, e);
         }
     }
 

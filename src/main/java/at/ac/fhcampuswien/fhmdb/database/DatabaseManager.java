@@ -27,31 +27,36 @@ public class DatabaseManager {
             movieDao = DaoManager.createDao(connectionSource, MovieEntity.class);
             watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
             createTables();
-        } catch (SQLException e) {
+        } catch (SQLException e) { //DB Errors
             System.err.println("Error initializing the database manager: " + e.getMessage());
             closeConnection();
-            throw new RuntimeException("Failed to initialize database connections", e);
+            throw new RuntimeException("Failed to initialize database connections", e); //Programming errors
         }
     }
 
     // Public method to get the singleton instance
-    public static synchronized DatabaseManager getInstance() {
+    public static synchronized DatabaseManager getInstance()  {
         if (instance == null) {
             instance = new DatabaseManager();
         }
         return instance;
     }
 
-    private void createConnectionSource() throws SQLException {
-        connectionSource = new JdbcConnectionSource(DB_URL, USERNAME, PASSWORD);
+    private void createConnectionSource() {
+        try {
+            connectionSource = new JdbcConnectionSource(DB_URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            System.err.println("Error creating connection source: " + e.getMessage());
+        }
     }
 
-    private void createTables() {
+    private void createTables()  {
         try {
             TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
             TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
         } catch (SQLException e) {
             System.err.println("Error creating tables: " + e.getMessage());
+            throw new RuntimeException("Failed to create database tables", e);
         }
     }
 
@@ -64,14 +69,14 @@ public class DatabaseManager {
     }
 
     // Ensure connections are closed properly
-    public void closeConnection() {
+    public static void closeConnection() {
         if (connectionSource != null) {
             try {
                 connectionSource.close();
             } catch (SQLException e) {
                 System.err.println("Error closing the database connection: " + e.getMessage());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                System.err.println("Unexpected error closing the database connection: " + e.getMessage());
             }
         }
     }
