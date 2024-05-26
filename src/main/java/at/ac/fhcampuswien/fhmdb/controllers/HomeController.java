@@ -65,13 +65,13 @@ public class HomeController implements Initializable {
 
         try {
             initializeState();
-        } catch (SQLException e) {
+        } catch (SQLException | DatabaseException e) {
             throw new RuntimeException(e);
         }
         initializeLayout();
     }
 
-    public void initializeState() throws SQLException {
+    public void initializeState() throws SQLException, DatabaseException {
         //Pull movies from the API into a list
         List<Movie> result = MovieAPI.getAllMovies();
         //Add the list to the MovieEntity table in the database

@@ -52,7 +52,6 @@ public class DatabaseManager {
             TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
         } catch (SQLException e) {
             System.err.println("Error creating tables: " + e.getMessage());
-            throw new RuntimeException("Failed to create tables", e);
         }
     }
 

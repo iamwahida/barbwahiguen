@@ -8,49 +8,65 @@ import java.util.List;
 
 public class MovieRepository {
 
-    //Create a Dao object (interface that provides methods for interacting with the database table without needing to write SQL queries)
+    // Create a Dao object (interface that provides methods for interacting with the database table without needing to write SQL queries)
     private Dao<MovieEntity, Long> dao;
 
     public MovieRepository(Dao<MovieEntity, Long> dao) {
         this.dao = dao;
     }
-    public MovieRepository(){}
 
-    //FUNCTIONS
-    //Return MovieEntity by apiId
-    public MovieEntity getMovieByApiId(String apiId) throws SQLException {
-        // Annahme: apiId ist eindeutig für jeden Film in der Datenbank
-        List<MovieEntity> movies = dao.queryForEq("api_id", apiId);
-        if (!movies.isEmpty()) {
-            return movies.get(0); //Es gibt nur einen Film mit einer bestimmten apiId
-        } else {
-            return null; // Film nicht gefunden
+    public MovieRepository() {}
+
+    // FUNCTIONS
+    // Return MovieEntity by apiId
+    public MovieEntity getMovieByApiId(String apiId) throws DatabaseException {
+        try {
+            // Annahme: apiId ist eindeutig für jeden Film in der Datenbank
+            List<MovieEntity> movies = dao.queryForEq("api_id", apiId);
+            if (!movies.isEmpty()) {
+                return movies.get(0); // Es gibt nur einen Film mit einer bestimmten apiId
+            } else {
+                return null; // Film nicht gefunden
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Error retrieving movie by API ID", e);
         }
     }
 
-    //Return all MovieEntities
-    public List <MovieEntity> getAllMovies() throws SQLException {
-        return dao.queryForAll();
+    // Return all MovieEntities
+    public List<MovieEntity> getAllMovies() throws DatabaseException {
+        try {
+            return dao.queryForAll();
+        } catch (SQLException e) {
+            throw new DatabaseException("Error retrieving all movies", e);
+        }
     }
 
-    //Remove all MovieEntities from the DB
-    public int removeAll() throws SQLException {
-        DeleteBuilder<MovieEntity, Long> deleteBuilder = dao.deleteBuilder();
-        return dao.delete(deleteBuilder.prepare());
+    // Remove all MovieEntities from the DB
+    public int removeAll() throws DatabaseException {
+        try {
+            DeleteBuilder<MovieEntity, Long> deleteBuilder = dao.deleteBuilder();
+            return dao.delete(deleteBuilder.prepare());
+        } catch (SQLException e) {
+            throw new DatabaseException("Error removing all movies", e);
+        }
     }
 
-    //Return one MovieEntity based on the id
-    public MovieEntity getMovie(Long id) throws SQLException {
-        return dao.queryForId(id);
+    // Return one MovieEntity based on the id
+    public MovieEntity getMovie(Long id) throws DatabaseException {
+        try {
+            return dao.queryForId(id);
+        } catch (SQLException e) {
+            throw new DatabaseException("Error retrieving movie by ID", e);
+        }
     }
 
-    //Add all MovieEntities to the Database
-    public int addAllMovies(List <MovieEntity> movies) throws SQLException {
+    // Add all MovieEntities to the Database
+    public int addAllMovies(List<MovieEntity> movies) throws DatabaseException {
         try {
             return dao.create(movies);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Error adding all movies", e);
         }
-        return 0;
     }
 }

@@ -100,7 +100,6 @@ public class MovieCell extends ListCell<Movie> {
                     try {
                         ((HomeController) controller).addMovieToWatchlist(movie);
                     } catch (DatabaseException e) {
-                        throw new RuntimeException(e);
                     }
                 } else if (controller instanceof WatchlistController) {
                     ((WatchlistController) controller).removeMovieFromWatchlist(movie);
