@@ -32,10 +32,9 @@ public class FhmdbApplication extends Application {
             alert.setHeaderText("Database Connection Error");
             alert.setContentText("Failed to initialize database connections. Please check your database configuration.");
             alert.showAndWait();
-        } finally {
             DatabaseManager.closeConnection();
-            //DatabaseManager.getInstance();
         }
+        //Still throwing: LoadException, RuntimeException, jdbc.JdbcSQLNonTransientConnectionException, MVStoreException
     }
 
     public static void main(String[] args) {
