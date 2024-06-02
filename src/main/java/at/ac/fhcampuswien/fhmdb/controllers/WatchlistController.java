@@ -24,6 +24,7 @@ import javafx.scene.control.ListView;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -42,7 +43,11 @@ public class WatchlistController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        watchlistRepository = new WatchlistRepository(DatabaseManager.getInstance().getWatchlistDao());
+        try {
+            watchlistRepository = new WatchlistRepository(DatabaseManager.getInstance().getWatchlistDao());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         try {
             refreshWatchlist();
         } catch (DatabaseException e) {

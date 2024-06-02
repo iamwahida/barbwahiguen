@@ -60,12 +60,17 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        movieRepository = new MovieRepository(DatabaseManager.getInstance().getMovieDao());
-        watchlistRepository = new WatchlistRepository(DatabaseManager.getInstance().getWatchlistDao());
-
+        try {
+            DatabaseManager.getInstance();
+            movieRepository = new MovieRepository(DatabaseManager.getInstance().getMovieDao());
+            watchlistRepository = new WatchlistRepository(DatabaseManager.getInstance().getWatchlistDao());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         try {
             initializeState();
         } catch (SQLException | DatabaseException e) {
+            DatabaseManager.closeConnection();
             throw new RuntimeException(e);
         }
         initializeLayout();
